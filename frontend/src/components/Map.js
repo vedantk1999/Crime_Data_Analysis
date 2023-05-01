@@ -23,6 +23,7 @@ const dangerIcon = new L.Icon({
 function Map({ crimeDetails, displayCategory, year, setLatlng }) {
     const [backGroundMode, setBackGroundMode] = useState(true)
     const [selectedCrime, setSelectedCrime] = useState("INVESTIGATE PERSON")
+    const [zoom, setZoom] = useState(15)
     function ClickComponent() {
         const map = useMapEvents({
             click: (e) => {
@@ -41,11 +42,24 @@ function Map({ crimeDetails, displayCategory, year, setLatlng }) {
 
     const mode = backGroundMode ? 'dark_all' : 'light_all'
     const tileUrl = `https://{s}.basemaps.cartocdn.com/${mode}/{z}/{x}/{y}{r}.png`
+    //marker 15
+    //alert 13
+    //heatmap 14
+    //analyze 13
 
-
+    useEffect(() => {
+        if (displayCategory === 'Markers')
+            setZoom(15)
+        if (displayCategory === 'Alerts')
+            setZoom(13)
+        if (displayCategory === 'Heatmaps')
+            setZoom(12)
+        if (displayCategory === 'Analyze')
+            setZoom(14)
+    }, [displayCategory])
 
     return (
-        <MapContainer center={[42.3601, -71.0589]} zoom={15} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}
+        <MapContainer center={[42.3601, -71.0589]} zoom={zoom} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}
             key={Math.random()}>
             {displayCategory === 'Heatmaps' ? <CrimeHeatmaps year={year} /> : ''}
             <TileLayer

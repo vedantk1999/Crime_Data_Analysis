@@ -13,12 +13,14 @@ const Dashboard = ({ handleFormResponse, latlng, displayCategory, crimeCountMont
     const minDate = dayjs('2015-08-01');
     const maxDate = dayjs('2023-05-01');
     const [selectedDate, setSelectedDate] = useState(minDate);
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null)
 
-    let lat, lng;
     useEffect(() => {
         if (latlng !== null) {
-            lat = parseFloat(latlng.lat.toFixed(2));
-            lng = parseFloat(latlng.lng.toFixed(2));
+
+            setLatitude(parseFloat(latlng.lat.toFixed(2)));
+            setLongitude(parseFloat(latlng.lng.toFixed(2)));
         }
     }, [latlng])
 
@@ -79,11 +81,16 @@ const Dashboard = ({ handleFormResponse, latlng, displayCategory, crimeCountMont
                     </Typography>
                     :
                     displayCategory === 'Markers' && crimeCountMonth === null ?
-                        <Loader />
+                        <>
+                            <Loader />
+                            <Typography variant='h6'>
+                                More than <span style={{ color: '#ff2625', textTransform: 'capitalize' }}>650k</span> crimes have taken place<br /> from 2015-2023.
+                            </Typography>
+                        </>
                         :
                         ''}
-                {displayCategory === 'Analyze' && latlng !== null ?
-                    <BarChart latlng={latlng} />
+                {displayCategory === 'Analyze' && latitude !== null ?
+                    <BarChart lat={latitude} lng={longitude} />
                     :
                     displayCategory === 'Analyze' && latlng === null ?
                         <Typography variant='h6'>Click on the Map To analyze an Area</Typography>

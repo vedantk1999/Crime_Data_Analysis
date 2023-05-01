@@ -1,153 +1,95 @@
 import React, { useEffect, useState } from 'react';
 import { Bar, Pie } from "react-chartjs-2";
 import { Chart as chartjs } from "chart.js/auto"
-import {
-    heatmapData2015,
-    heatmapData2016,
-    heatmapData2017,
-    heatmapData2018,
-    heatmapData2019,
-    heatmapData2020,
-    heatmapData2021,
-    heatmapData2022,
-    heatmapData2023
-} from '../assets/heatmapData';
+import axios from 'axios';
+import Loader from './Loader';
+import { Typography } from '@mui/material';
 
 
-const UserData = [
-    {
-        id: 1,
-        year: 2016,
-        userGain: 80000,
-        userLost: 823,
-    },
-    {
-        id: 2,
-        year: 2017,
-        userGain: 45677,
-        userLost: 345,
-    },
-    {
-        id: 3,
-        year: 2018,
-        userGain: 78888,
-        userLost: 555,
-    },
-    {
-        id: 4,
-        year: 2019,
-        userGain: 90000,
-        userLost: 4555,
-    },
-    {
-        id: 5,
-        year: 2020,
-        userGain: 4300,
-        userLost: 234,
-    }, {
-        id: 6,
-        year: 2021,
-        userGain: 87000,
-        userLost: 4555,
-    },
-    {
-        id: 7,
-        year: 2022,
-        userGain: 43000,
-        userLost: 234,
-    }, {
-        id: 8,
-        year: 2023,
-        userGain: 43000,
-        userLost: 234,
-    },
-];
-
-// define the latitude and longitude
-const latitude = 42.23;
-const longitude = -71.14;
-// define the years
-const years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023];
-let heatmapDataByYear;
-const find_intensities = () => {
-    let intensities = []
-    for (const year of years) {
-        switch (year) {
-            case 2015:
-                heatmapDataByYear = heatmapData2015;
-                break;
-            case 2016:
-                heatmapDataByYear = heatmapData2016;
-                break;
-            case 2017:
-                heatmapDataByYear = heatmapData2017;
-                break;
-            case 2018:
-                heatmapDataByYear = heatmapData2018;
-                break;
-            case 2019:
-                heatmapDataByYear = heatmapData2019;
-                break;
-            case 2020:
-                heatmapDataByYear = heatmapData2020;
-                break;
-            case 2021:
-                heatmapDataByYear = heatmapData2021;
-                break;
-            case 2022:
-                heatmapDataByYear = heatmapData2022;
-                break;
-            case 2023:
-                heatmapDataByYear = heatmapData2023;
-                break;
-            default:
-                heatmapDataByYear = heatmapData2023; // set default value
+const BarChart = ({ lat, lng }) => {
+    const [chartData, setChartData] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [displayChart, setDisplayChart] = useState(true)
+    const [percentage, setPercentage] = useState(null)
+    useEffect(() => {
+        console.log(lat, lng)
+        if (lat) {
+            getChartData(lat, lng);
         }
+    }, [lat, lng])
+    useEffect(() => {
+        if (chartData && chartData.intensities_requested.length === 9) {
+            setDisplayChart(true)
+            setPercentage(calculateCrimePercentages(chartData.intensities_max, chartData.intensities_min, chartData.intensities_requested))
+            setUserData({
+                // UserData.map((data) => data.year)
+                labels: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
+                datasets: [{
+                    label: "Crimes",
+                    data: chartData.intensities_requested,
+                    backgroundColor: [
+                        "#264653",
+                        "#287271",
+                        "#2A9D8F",
+                        "#8AB17D",
+                        "#E9C46A",
+                        "#EFB366",
+                        "#F4A261",
+                        "#EE8959",
+                        '#E76F51'
+                    ],
+                    borderWidth: 0,
+                }]
+            })
+        } else {
+            setDisplayChart(false)
+        }
+    }, [chartData])
 
-        // find the intensity for the given latitude and longitude in the current year's data
-        const intensity = heatmapDataByYear.reduce((acc, [lat, lng, value]) => {
-            if (lat === latitude && lng === longitude) {
-                acc = value;
-                console.log("Found")
-            }
-            return acc;
-        }, null);
-        intensities.push(intensity)
+    function calculateCrimePercentages(crimesMax, crimesMin, crimesRegion) {
+        const totalCrimes = crimesRegion.reduce((acc, curr) => acc + curr, 0);
+        const maxCrimes = crimesMax.reduce((acc, curr) => acc + curr, 0);
+        const minCrimes = crimesMin.reduce((acc, curr) => acc + curr, 0);
+
+        const lessPercentage = ((maxCrimes - totalCrimes) / maxCrimes) * 100;
+        const morePercentage = ((totalCrimes - minCrimes) / minCrimes) * 100;
+
+        return [lessPercentage, morePercentage];
     }
-    return intensities;
-}
 
+    const getChartData = (lat, lng) => {
+        axios.get(`http://localhost:5000/predict_crimes?lat=${lat}&lng=${lng}`)
+            .then(function (response) {
+                console.log("SUCCESS", response.data)
+                setChartData(response.data)
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
 
-const BarChart = ({ latlng }) => {
-    let values = find_intensities();
-    console.log(values)
-    const [userData, setUserData] = useState({
-        // UserData.map((data) => data.year)
-        labels: years,
-        datasets: [{
-            label: latlng,
-            data: values,
-            backgroundColor: [
-                "#264653",
-                "#287271",
-                "#2A9D8F",
-                "#8AB17D",
-                "#E9C46A",
-                "#EFB366",
-                "#F4A261",
-                "#EE8959",
-                '#E76F51'
-            ],
-            borderWidth: 0,
-        }]
-    })
     return (
         <div style={{ width: "100%", height: "100%" }}>
             {/* <div style={{ width: "100%", height: "30%" }}>
                 <Bar data={userData} />
             </div> */}
-            <div style={{ width: "100%", height: "100%" }}>
-                <Pie data={userData} />
+            <div style={{ width: "100%", height: "100%", display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                {displayChart === true && userData === null ?
+                    <Loader />
+                    :
+                    displayChart === true && userData !== null ?
+                        <>
+                            <Pie data={userData} />
+                            <Typography variant='h6'>
+                                Crimes in <span style={{ color: '#ff2625', textTransform: 'capitalize' }}>({lat}°, {lng}°)</span> over the years
+                            </Typography>
+                            <Typography variant='p' sx={{ color: '#333' }}>
+                                <span style={{ color: '#ff2625', textTransform: 'capitalize' }}>{percentage[0].toFixed(2)}%</span> less crimes compared to the most dangerous area.
+                            </Typography>
+                        </>
+                        :
+                        <Typography variant='h6'>Either you clicked outside Boston or<br /> There is not enough data to display</Typography>}
+
             </div>
         </div>
     )
