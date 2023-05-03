@@ -1,5 +1,8 @@
 # Boston-Crime-Visualization-using-React
 
+
+Download [data](https://drive.google.com/drive/folders/1UEGRMv9lVpLZERrSsiRCFYI7WCA4lySI?usp=sharing) and place it at the root directory.
+
 `Render Page`
 ![Render page](https://i.imgur.com/GS0XMPE.jpg)
 
