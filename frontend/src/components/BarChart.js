@@ -58,7 +58,7 @@ const BarChart = ({ lat, lng }) => {
     }
 
     const getChartData = (lat, lng) => {
-        axios.get(`http://localhost:5000/predict_crimes?lat=${lat}&lng=${lng}`)
+        axios.get(`http://127.0.0.1:5000/predict_crimes?lat=${lat}&lng=${lng}`)
             .then(function (response) {
                 console.log("SUCCESS", response.data)
                 setChartData(response.data)

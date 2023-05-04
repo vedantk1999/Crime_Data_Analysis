@@ -47,7 +47,7 @@ function App() {
   }
 
   const getCrimeDetails = (year, month) => {
-    axios.get(`http://localhost:5000/marker_data?year=${year}&month=${month}`)
+    axios.get(`http://127.0.0.1:5000/marker_data?year=${year}&month=${month}`)
       .then(function (response) {
         console.log("SUCCESS", response.data.total_count_of_the_month)
         setResponseReceived(response.data.crimeDetails);

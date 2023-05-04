@@ -14,3 +14,6 @@ def serve(path):
 
 api.add_resource(MarkerApi, '/marker_data')
 api.add_resource(PredictCrimes, '/predict_crimes')
+
+if __name__ == '__main__':
+    app.run(debug=True, host="0.0.0.0")

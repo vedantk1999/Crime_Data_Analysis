@@ -61,8 +61,8 @@ const CrimeHeatmaps = ({ year }) => {
     }, [year]);
     return (
         <HeatmapLayer
-            fitBoundsOnLoad
-            fitBoundsOnUpdate
+            // fitBoundsOnLoad
+            // fitBoundsOnUpdate
             points={data}
             longitudeExtractor={(point) => point[1]}
             latitudeExtractor={(point) => point[0]}

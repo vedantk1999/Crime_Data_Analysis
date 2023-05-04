@@ -53,7 +53,7 @@ function Map({ crimeDetails, displayCategory, year, setLatlng }) {
         if (displayCategory === 'Alerts')
             setZoom(13)
         if (displayCategory === 'Heatmaps')
-            setZoom(12)
+            setZoom(11)
         if (displayCategory === 'Analyze')
             setZoom(14)
     }, [displayCategory])
